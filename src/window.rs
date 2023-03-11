@@ -72,7 +72,7 @@ impl Window {
                 let a = ((color >> 24) & 0xff) as u8;
 
                 self.canvas.set_draw_color(Color::RGBA(r, g, b, a));
-                let rect = Rect::new(x as i32, y as i32, 1, 1);
+                let rect = Rect::new(x as i32, (image.get_height() - 1 - y) as i32, 1, 1);
                 self.canvas.fill_rect(rect).expect("Failed to fill rect");
             }
         }
