@@ -11,12 +11,12 @@ impl Renderer {
         }
     }
 
-    pub fn resize(&mut self, width: usize, height: usize) {
-        self.image.resize(width, height);
-    }
-
     pub fn final_image(&self) -> &Image {
         &self.image
+    }
+
+    pub fn on_resize(&mut self, width: usize, height: usize) {
+        self.image.resize(width, height);
     }
 
     pub fn render(&mut self) {

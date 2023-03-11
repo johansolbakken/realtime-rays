@@ -14,7 +14,7 @@ pub fn main() {
 
     while !window.should_close() {
         let _profile = scope("Run loop");
-        renderer.resize(window.get_width(), window.get_height());
+        renderer.on_resize(window.get_width(), window.get_height());
         renderer.render();
 
         window.show(renderer.final_image());
