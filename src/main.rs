@@ -7,6 +7,7 @@ mod image;
 mod profile;
 mod renderer;
 mod window;
+mod utils;
 
 pub fn main() {
     let mut window = Window::new("Realtime renderer", 1280, 720);

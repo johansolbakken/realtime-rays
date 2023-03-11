@@ -1,6 +1,6 @@
-use glm::Vector2;
+use glm::{Vector2, Vector4};
 
-use crate::image::{Color, Image};
+use crate::{image::Image, utils};
 
 pub struct Renderer {
     image: Image,
@@ -32,12 +32,12 @@ impl Renderer {
 
                 let color = self.per_pixel(coord);
 
-                self.image.set_pixel(x, y, color); // ABGR
+                self.image.set_pixel(x, y, utils::convert_to_rgba(&color)); // ABGR
             }
         }
     }
 
-    fn per_pixel(&mut self, coord: Vector2<f32>) -> Color {
+    fn per_pixel(&mut self, coord: Vector2<f32>) -> Vector4<f32> {
         let r = (coord.x * 255.0) as u8 as u32;
         let g = (coord.y * 255.0) as u8 as u32;
 
@@ -52,9 +52,9 @@ impl Renderer {
         let discriminant = b * b - 4.0 * a * c;
 
         if discriminant >= 0.0 {
-            return 0xffff00ff;
+            return glm::vec4(1.0, 0.0, 1.0, 1.0);
         }
 
-        0xff000000
+        glm::vec4(0.0, 0.0, 0.0, 1.0)
     }
 }
