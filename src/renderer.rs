@@ -1,6 +1,6 @@
 use glm::Vector4;
 
-use crate::{camera::Camera, image::Image, ray::Ray, scene::Scene, utils};
+use crate::{camera::Camera, image::Image, ray::Ray, scene::Scene, utils, profile};
 
 pub struct Renderer {
     image: Image,
@@ -22,6 +22,7 @@ impl Renderer {
     }
 
     pub fn render(&mut self, scene: &Scene, camera: &Camera) {
+        let _profile = profile::scope("Render");
         let mut ray = Ray {
             origin: camera.get_position().clone(),
             direction: glm::to_vec3(0.0),
