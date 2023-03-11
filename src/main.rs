@@ -10,7 +10,7 @@ mod window;
 mod utils;
 
 pub fn main() {
-    let mut window = Window::new("Realtime renderer", 1280, 720);
+    let mut window = Window::new("Realtime renderer", 800, 800);
     let mut renderer = Renderer::new();
 
     while !window.should_close() {
