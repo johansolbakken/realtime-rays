@@ -9,3 +9,9 @@ pub fn convert_to_rgba(color: &Vector4<f32>) -> Color {
     let a = ((color.w * 255.0) as u32) << 24;
     r | g | b | a
 }
+
+pub fn identity_mat4() -> glm::Mat4 {
+    glm::mat4(
+        1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+    )
+}
