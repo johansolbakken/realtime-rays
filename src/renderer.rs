@@ -1,6 +1,12 @@
 use glm::Vector4;
 
-use crate::{camera::Camera, image::Image, ray::Ray, scene::Scene, utils};
+use crate::{
+    camera::Camera,
+    image::Image,
+    ray::Ray,
+    scene::Scene,
+    utils::{self, random_range_vec3},
+};
 
 pub struct Renderer {
     image: Image,
@@ -58,11 +64,11 @@ impl Renderer {
 
         let mut color = glm::to_vec3(0.0);
         let mut multiplier = 1.0;
-        let bounces = 2;
+        let bounces = 5;
         for _i in 0..bounces {
             let payload = self.trace_ray(env, &ray);
             if payload.hit_distance < 0.0 {
-                let sky_color = glm::vec3(0.0, 0.0, 0.0);
+                let sky_color = glm::vec3(0.6, 0.7, 0.9);
                 color = color + sky_color * multiplier;
                 break;
             }
@@ -71,14 +77,19 @@ impl Renderer {
             let light_intensity = glm::max(glm::dot(payload.world_normal, -light_dir), 0.0);
 
             let sphere = &env.active_scene.spheres[payload.object_index as usize];
-            let mut sphere_color = env.active_scene.materials[sphere.material_index].albedo;
+            let material = &env.active_scene.materials[sphere.material_index];
+
+            let mut sphere_color = material.albedo;
             sphere_color = sphere_color * light_intensity;
             color = color + sphere_color * multiplier;
             multiplier *= 0.7;
 
             // Shooting out another ray
             ray.origin = payload.world_position + payload.world_normal * 0.0001;
-            ray.direction = glm::reflect(ray.direction, payload.world_normal);
+            ray.direction = glm::reflect(
+                ray.direction,
+                payload.world_normal + random_range_vec3(-0.5, 0.5) * material.roughness,
+            );
         }
 
         glm::vec4(color.x, color.y, color.z, 1.0)

@@ -111,12 +111,12 @@ pub fn create_test_scene_3() -> Scene {
         materials: vec![
             Material {
                 albedo: glm::vec3(1.0, 0.0, 1.0),
-                roughness: 1.0,
+                roughness: 0.3,
                 metallic: 0.0,
             },
             Material {
                 albedo: glm::vec3(0.2, 0.3, 1.0),
-                roughness: 1.0,
+                roughness: 0.6,
                 metallic: 0.0,
             },
         ],

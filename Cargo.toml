@@ -8,4 +8,5 @@ edition = "2021"
 [dependencies]
 chrono = "0.4.23"
 glm = "0.2.3"
+rand = "0.8.5"
 sdl2 = "0.35.2"
