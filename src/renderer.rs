@@ -39,8 +39,6 @@ impl Renderer {
             active_camera: camera,
         };
 
-        let _profile = profile::scope("Render");
-
         for y in 0..self.image.get_height() {
             for x in 0..self.image.get_width() {
                 let mut color = self.per_pixel(&env, x, y);
