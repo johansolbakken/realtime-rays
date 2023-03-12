@@ -2,7 +2,7 @@ use camera::Camera;
 use profile::scope;
 use renderer::Renderer;
 
-use scene::{create_test_scene};
+use scene::{create_test_scene, create_test_scene_2};
 use window::Window;
 
 mod camera;
@@ -19,7 +19,11 @@ pub fn main() {
     let mut camera = Camera::new(45.0, 0.1, 100.0);
     let mut renderer = Renderer::new();
 
-    let scene = create_test_scene();
+    let scene_selector = 2;
+    let scene = match scene_selector {
+        2 => create_test_scene_2(),
+        _ => create_test_scene(),
+    };
 
     while !window.should_close() {
         let _profile = scope("Run loop");
