@@ -28,7 +28,7 @@ impl Camera {
             vertical_fov,
             near_clip,
             far_clip,
-            position: glm::vec3(0.0, 0.0, 3.0),
+            position: glm::vec3(0.0, 0.0, 6.0),
             forward_direction: glm::vec3(0.0, 0.0, -1.0),
             ray_directions: Vec::new(),
             _last_mouse_position: glm::to_vec2(0.0),
