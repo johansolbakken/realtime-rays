@@ -61,3 +61,20 @@ pub fn create_test_scene_2() -> Scene {
         ],
     }
 }
+
+pub fn create_test_scene_3() -> Scene {
+    Scene {
+        spheres: vec![
+            Sphere {
+                position: glm::to_vec3(0.0),
+                radius: 1.0,
+                albedo: glm::vec3(1.0, 0.0, 1.0),
+            },
+            Sphere {
+                position: glm::vec3(0.0, -101.0, 0.0),
+                radius: 100.0,
+                albedo: glm::vec3(0.2, 0.3, 1.0),
+            },
+        ],
+    }
+}
