@@ -14,7 +14,7 @@ struct Environment<'a> {
 struct HitPayload {
     hit_distance: f32,
     world_normal: glm::Vector3<f32>,
-    _world_position: glm::Vector3<f32>,
+    world_position: glm::Vector3<f32>,
     object_index: i32,
 }
 
@@ -50,23 +50,38 @@ impl Renderer {
 
     fn per_pixel(&mut self, env: &Environment, x: usize, y: usize) -> Vector4<f32> {
         // RayGen in Gpu architectures
-        let ray = Ray {
+        let mut ray = Ray {
             origin: env.active_camera.get_position().clone(),
             direction: env.active_camera.get_ray_directions()
                 [x + y * self.final_image().get_width()],
         };
 
-        let payload = self.trace_ray(env, &ray);
-        if payload.hit_distance < 0.0 {
-            return glm::vec4(0.0, 0.0, 0.0, 1.0);
+        let mut color = glm::to_vec3(0.0);
+        let mut multiplier = 1.0;
+        let bounces = 2;
+        for _i in 0..bounces {
+            let payload = self.trace_ray(env, &ray);
+            if payload.hit_distance < 0.0 {
+                let sky_color = glm::vec3(0.0, 0.0, 0.0);
+                color = color + sky_color * multiplier;
+                break;
+            }
+
+            let light_dir = glm::normalize(glm::vec3(-1.0, -1.0, -1.0));
+            let light_intensity = glm::max(glm::dot(payload.world_normal, -light_dir), 0.0);
+
+            let sphere = &env.active_scene.spheres[payload.object_index as usize];
+            let mut sphere_color = sphere.albedo;
+            sphere_color = sphere_color * light_intensity;
+            color = color + sphere_color * multiplier;
+            multiplier *= 0.7;
+
+            // Shooting out another ray
+            ray.origin = payload.world_position + payload.world_normal * 0.0001;
+            ray.direction = glm::reflect(ray.direction, payload.world_normal);
         }
 
-        let sphere = &env.active_scene.spheres[payload.object_index as usize];
-
-        let light_dir = glm::normalize(glm::vec3(-1.0, -1.0, -1.0));
-        let light_intensity = glm::max(glm::dot(payload.world_normal, -light_dir), 0.0);
-        let sphere_color = sphere.albedo * light_intensity;
-        glm::vec4(sphere_color.x, sphere_color.y, sphere_color.z, 1.0)
+        glm::vec4(color.x, color.y, color.z, 1.0)
     }
 
     fn trace_ray(&mut self, env: &Environment, ray: &Ray) -> HitPayload {
@@ -88,7 +103,7 @@ impl Renderer {
             let closest_t = (-b - discriminant.sqrt()) / (2.0 * a);
             // let t0 = (-b + discriminant.sqrt()) / (2.0 * a); // Second hit point. Will us this later.
 
-            if closest_t < hit_distance {
+            if closest_t > 0.0 && closest_t < hit_distance {
                 object_index = i as i32;
                 hit_distance = closest_t;
             }
@@ -117,7 +132,7 @@ impl Renderer {
         HitPayload {
             hit_distance,
             world_normal,
-            _world_position: world_position,
+            world_position,
             object_index,
         }
     }
@@ -126,7 +141,7 @@ impl Renderer {
         HitPayload {
             hit_distance: -1.0,
             world_normal: glm::to_vec3(0.0),
-            _world_position: glm::to_vec3(0.0),
+            world_position: glm::to_vec3(0.0),
             object_index: 0,
         }
     }
