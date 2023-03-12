@@ -1,6 +1,6 @@
 use glm::Vector4;
 
-use crate::{camera::Camera, image::Image, profile, ray::Ray, scene::Scene, utils};
+use crate::{camera::Camera, image::Image, ray::Ray, scene::Scene, utils};
 
 pub struct Renderer {
     image: Image,
