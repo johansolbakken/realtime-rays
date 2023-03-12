@@ -71,7 +71,7 @@ impl Renderer {
             let light_intensity = glm::max(glm::dot(payload.world_normal, -light_dir), 0.0);
 
             let sphere = &env.active_scene.spheres[payload.object_index as usize];
-            let mut sphere_color = sphere.albedo;
+            let mut sphere_color = env.active_scene.materials[sphere.material_index].albedo;
             sphere_color = sphere_color * light_intensity;
             color = color + sphere_color * multiplier;
             multiplier *= 0.7;
