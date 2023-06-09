@@ -22,26 +22,7 @@ mod window;
 /*
 pub fn main2() {
     let mut window = Window::new("Realtime renderer", 1280, 860);
-    let mut camera = Camera::new(45.0, 0.1, 100.0);
-    let mut renderer = Renderer::new();
 
-    let scene_selector = 3;
-    let scene = match scene_selector {
-        2 => create_test_scene_2(),
-        3 => create_test_scene_3(),
-        _ => create_test_scene(),
-    };
-
-    while !window.should_close() {
-        let _profile = scope("Run loop");
-        camera.on_resize(window.get_width(), window.get_height());
-        camera.on_update(0.0);
-        renderer.on_resize(window.get_width(), window.get_height());
-        renderer.render(&scene, &camera);
-
-        window.show(renderer.final_image());
-        window.update();
-    }
 }*/
 
 #[repr(C)]
@@ -132,31 +113,32 @@ pub async fn main() {
         source: wgpu::ShaderSource::Wgsl(include_str!("shader.wgsl").into()),
     });
 
+    // square for whole screen
     const VERTICES: &[Vertex] = &[
         Vertex {
-            position: [-0.0868241, 0.49240386, 0.0],
-            tex_coords: [0.4131759, 0.99240386],
-        }, // A
+            position: [-1.0, -1.0, 0.0],
+            tex_coords: [0.0, 0.0],
+        },
         Vertex {
-            position: [-0.49513406, 0.06958647, 0.0],
-            tex_coords: [0.0048659444, 0.56958647],
-        }, // B
+            position: [1.0, -1.0, 0.0],
+            tex_coords: [1.0, 0.0],
+        },
         Vertex {
-            position: [-0.21918549, -0.44939706, 0.0],
-            tex_coords: [0.28081453, 0.05060294],
-        }, // C
+            position: [-1.0, 1.0, 0.0],
+            tex_coords: [0.0, 1.0],
+        },
         Vertex {
-            position: [0.35966998, -0.3473291, 0.0],
-            tex_coords: [0.85967, 0.1526709],
-        }, // D
-        Vertex {
-            position: [0.44147372, 0.2347359, 0.0],
-            tex_coords: [0.9414737, 0.7347359],
-        }, // E
+            position: [1.0, 1.0, 0.0],
+            tex_coords: [1.0, 1.0],
+        },
     ];
+
     let num_vertices = VERTICES.len() as u32;
 
-    const INDICES: &[u16] = &[0, 1, 4, 1, 2, 4, 2, 3, 4];
+    const INDICES: &[u16] = &[
+        0, 1, 2, // 1.
+        2, 1, 3, // 2.
+    ];
     let num_indices = INDICES.len() as u32;
 
     let vertex_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
@@ -207,36 +189,6 @@ pub async fn main() {
         label: Some("texture"),
         view_formats: &[],
     });
-
-    let mut pixel_data = vec![0u8; (4 * size.width * size.height) as usize];
-    for x in 0..size.width {
-        for y in 0..size.height {
-            let offset = 4 * (y * size.width + x) as usize;
-            pixel_data[offset] = (x * 256 / size.width) as u8; // R
-            pixel_data[offset + 1] = (y * 256 / size.height) as u8; // G
-            pixel_data[offset + 2] = 0; // B
-            pixel_data[offset + 3] = 255; // A
-        }
-    }
-
-    queue.write_texture(
-        // Tells wgpu where to copy the pixel data
-        wgpu::ImageCopyTexture {
-            texture: &texture,
-            mip_level: 0,
-            origin: wgpu::Origin3d::ZERO,
-            aspect: wgpu::TextureAspect::All,
-        },
-        // The actual pixel data
-        bytemuck::cast_slice(&pixel_data),
-        // The layout of the texture
-        wgpu::ImageDataLayout {
-            offset: 0,
-            bytes_per_row: Some(4 * size.width),
-            rows_per_image: Some(size.height),
-        },
-        texture_size,
-    );
 
     let diffuse_texture_view = texture.create_view(&wgpu::TextureViewDescriptor::default());
     let diffuse_sampler = device.create_sampler(&wgpu::SamplerDescriptor {
@@ -339,7 +291,16 @@ pub async fn main() {
         multiview: None, // 5.
     });
 
-    let mut i = 0;
+    // nihao i e johan
+    let mut camera = Camera::new(45.0, 0.1, 100.0);
+    let mut renderer = Renderer::new();
+
+    let scene_selector = 3;
+    let scene = match scene_selector {
+        2 => create_test_scene_2(),
+        3 => create_test_scene_3(),
+        _ => create_test_scene(),
+    };
 
     event_loop.run(move |event, _, control_flow| match event {
         Event::WindowEvent {
@@ -359,17 +320,13 @@ pub async fn main() {
             _ => {}
         },
         Event::RedrawRequested(_) => {
-            i += 1;
-            let color_offset = (i % 256) as u32;
-            for x in 0..size.width {
-                for y in 0..size.height {
-                    let offset = 4 * (y * size.width + x) as usize;
-                    pixel_data[offset] = ((x + color_offset) * 256 / size.width) as u8; // R
-                    pixel_data[offset + 1] = ((y + color_offset) * 256 / size.height) as u8; // G
-                    pixel_data[offset + 2] = 0; // B
-                    pixel_data[offset + 3] = 255; // A
-                }
-            }
+            camera.on_resize(size.width as usize, size.height as usize);
+            camera.on_update(0.0);
+            renderer.on_resize(size.width as usize, size.height as usize);
+            renderer.render(&scene, &camera);
+
+            let final_image = renderer.final_image();
+            let final_image_buffer = final_image.buffer();
 
             queue.write_texture(
                 wgpu::ImageCopyTexture {
@@ -378,7 +335,7 @@ pub async fn main() {
                     origin: wgpu::Origin3d::ZERO,
                     aspect: wgpu::TextureAspect::All,
                 },
-                bytemuck::cast_slice(&pixel_data),
+                bytemuck::cast_slice(final_image_buffer),
                 wgpu::ImageDataLayout {
                     offset: 0,
                     bytes_per_row: Some(4 * size.width),
@@ -421,15 +378,14 @@ pub async fn main() {
                 });
                 render_pass.set_pipeline(&render_pipeline);
                 render_pass.set_bind_group(0, &diffuse_bind_group, &[]); // NEW!
-                render_pass.set_vertex_buffer(0, vertex_buffer.slice(..));
-                render_pass.set_index_buffer(index_buffer.slice(..), wgpu::IndexFormat::Uint16); // 1.
+                render_pass.set_vertex_buffer(0, vertex_buffer.slice(..)); // 1.
+                render_pass.set_index_buffer(index_buffer.slice(..), wgpu::IndexFormat::Uint16);
                 render_pass.draw_indexed(0..num_indices, 0, 0..1); // 2.
             }
 
             // submit will accept anything that implements IntoIter
             queue.submit(std::iter::once(encoder.finish()));
             output.present();
-            window.request_redraw();
         }
         _ => {}
     });

@@ -47,4 +47,8 @@ impl Image {
         assert!(location < self.width * self.height);
         self.pixels[location]
     }
+
+    pub fn buffer(&self) -> &[Color] {
+        &self.pixels
+    }
 }
