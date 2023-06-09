@@ -19,11 +19,6 @@ mod renderer;
 mod scene;
 mod utils;
 mod window;
-/*
-pub fn main2() {
-    let mut window = Window::new("Realtime renderer", 1280, 860);
-
-}*/
 
 #[repr(C)]
 #[derive(Copy, Clone, Debug, bytemuck::Pod, bytemuck::Zeroable)]
