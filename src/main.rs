@@ -4,7 +4,6 @@ use renderer::Renderer;
 
 use scene::{create_test_scene, create_test_scene_2, create_test_scene_3};
 
-use tracing::info;
 use winit::{
     event::{ElementState, Event, KeyboardInput, VirtualKeyCode, WindowEvent},
     event_loop::{ControlFlow, EventLoop},
