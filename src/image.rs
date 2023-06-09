@@ -42,12 +42,6 @@ impl Image {
         self.height
     }
 
-    pub fn get_pixel(&self, x: usize, y: usize) -> Color {
-        let location = x + y * self.width;
-        assert!(location < self.width * self.height);
-        self.pixels[location]
-    }
-
     pub fn buffer(&self) -> &[Color] {
         &self.pixels
     }
