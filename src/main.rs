@@ -18,7 +18,6 @@ mod ray;
 mod renderer;
 mod scene;
 mod utils;
-mod window;
 
 #[repr(C)]
 #[derive(Copy, Clone, Debug, bytemuck::Pod, bytemuck::Zeroable)]
